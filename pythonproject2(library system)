@@ -1,0 +1,101 @@
+class Book:
+    def __init__(self, title, author, isbn, status="Available"):
+        self.title = title
+        self.author = author
+        self.isbn = isbn
+        self.status = status
+
+    def display(self):
+        print(f"{self.title} | {self.author} | {self.isbn} | {self.status}")
+
+    def issue(self):
+        if self.status == "Issued":
+            print("Book already issued.")
+        else:
+            self.status = "Issued"
+            print("Book issued successfully.")
+
+    def return_book(self):
+        if self.status == "Available":
+            print("Book is already available.")
+        else:
+            self.status = "Available"
+            print("Book returned successfully.")
+
+    def save(self):
+        try:
+            with open("library.txt", "a") as f:
+                f.write(f"{self.title},{self.author},{self.isbn},{self.status}\n")
+            print("Book saved to file.")
+        except:
+            print("Error while saving data.")
+            
+
+def load_books():
+    books = []
+    try:
+        with open("library.txt", "r") as f:
+            for line in f:
+                title, author, isbn, status = line.split(",")
+                books.append(Book(title, author, isbn, status))
+    except FileNotFoundError:
+        pass  # File doesn't exist yet
+    return books
+
+
+# ------------------- MAIN PROGRAM -------------------
+
+books = load_books()
+
+while True:
+    print("\n1. Add Book")
+    print("2. View Books")
+    print("3. Issue Book")
+    print("4. Return Book")
+    print("5. Exit")
+
+    try:
+        choice = int(input("Enter choice: "))
+    except ValueError:
+        print("Enter a valid number!")
+        continue
+
+    if choice == 1:
+        title = input("Title: ")
+        author = input("Author: ")
+        isbn = input("ISBN: ")
+        b = Book(title, author, isbn)
+        b.save()
+        books.append(b)
+
+    elif choice == 2:
+        if not books:
+            print("No books found.")
+        else:
+            for b in books:
+                b.display()
+
+    elif choice == 3:
+        isbn = input("ISBN to issue: ")
+        for b in books:
+            if b.isbn == isbn:
+                b.issue()
+                break
+        else:
+            print("Book not found.")
+
+    elif choice == 4:
+        isbn = input("ISBN to return: ")
+        for b in books:
+            if b.isbn == isbn:
+                b.return_book()
+                break
+        else:
+            print("Book not found.")
+
+    elif choice == 5:
+        print("Exiting...")
+        break
+
+    else:
+        print("Invalid choice!")
